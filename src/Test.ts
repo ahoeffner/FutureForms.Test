@@ -8,9 +8,10 @@ export class Test
    }
 
 
-   public connect() : void
+   public async connect()
    {
       let session:Session = new Session();
-      session.connect("hr","hr");
+      let success:boolean = await session.connect("hr","hr");
+      console.log(JSON.stringify(success));
    }
 }

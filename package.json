@@ -1,0 +1,25 @@
+{
+  "name": "test",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Test suite for futureforms",
+  "scripts": {
+    "test": "cd dist && ls",
+    "server": "live-server --port=5500 --open=./dist/index.html &",
+    "build": "webpack --mode production && cp index.html dist"
+  },
+  "keywords": [],
+  "author": "Alex Høffner",
+  "license": "ISC",
+  "dependencies": {
+    "futureforms": "file:../lib/dist"
+  },
+  "devDependencies": {
+    "html-loader": "*",
+    "live-server": "*",
+    "ts-loader": "*",
+    "typescript": "*",
+    "webpack": "*",
+    "webpack-cli": "*"
+  }
+}

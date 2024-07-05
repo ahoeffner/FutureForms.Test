@@ -35,6 +35,7 @@ export class Test
          console.log(cursor.getRecord());
       }
 
+      cursor.close();
       console.log("rows: "+rows);
 
       success = await session.disconnect();

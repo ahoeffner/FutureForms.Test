@@ -253,6 +253,6 @@ export class Test
          return;
       }
 
-      console.log(proc.getValue("MiN")+" "+proc.getValue("max"))
+      console.log(job+" -> min: "+proc.getValue("MiN")+", max: "+proc.getValue("max"))
    }
 }

@@ -1,40 +1,258 @@
-import { Cursor, Filter, FilterGroup, Filters, Session, Table, TableDefinition } from 'futureforms';
+import { AnySQL, Cursor, Delete, Filter, FilterGroup, Filters, Insert, NameValuePair, Procedure, Query, Record, RecordDefinition, Session, Table, Update } from 'futureforms';
 
 export class Test
 {
-   public async connect()
+   public async run()
    {
       let session:Session = new Session();
-      session.addVPDContext("country","DK");
-
       let success:boolean = await session.connect("hr","hr");
-      console.log("connect: "+success);
 
-      let table:Table = new Table(session,"employees");
+      if (success)
+      {
+         //await this.countries1(session);
+         //await this.locations1(session);
+         //await this.locations2(session);
+         //await this.employees1(session);
+         //await this.employees2(session);
+         //await this.employees3(session);
+         //await this.custom1(session);
 
-      table.setArrayFetch(400);
-      table.setOrder("first_name desc");
+         await this.getSalaryLimit(session);
 
-      let date:Date = new Date("Sun Oct 19 2014 00:00:00 GMT+0200");
+         success = await session.disconnect();
+      }
+      else
+      {
+         console.log("Failed to connect");
+      }
+   }
 
-      let filter1:Filter = Filters.IsNotNull("last_name");
-      let filter2:Filter = Filters.Like("first_name","Mia");
-      let filter3:Filter = Filters.Dates.AtThisYear("hire_date",date);
 
-      let columns:string[] = ["first_name","last_name","hire_date"];
-      let cursor:Cursor = await table.executeQuery(columns,new FilterGroup([filter1,filter2,filter3]));
+   public async countries1(session:Session) : Promise<void>
+   {
+      let cursor:Cursor = null;
 
+      let table:Table = new Table(session,"countries");
+      let filter:Filter = Filters.Equals("country_id","XA");
+
+      // Create new record
+      let columns:string[] = ["country_id","country_name"];
+      let retcols:string[] = ["country_id","country_name"];
+
+      let recdef:RecordDefinition = new RecordDefinition(columns);
+      let insert:Insert = new Insert(table).setReturnColumns(retcols);
+
+      if (await insert.execute(new Record(recdef,["XA","Xanadux"])))
+      {
+         cursor = insert.getReturnValues();
+
+         await cursor.next();
+         let record:Record = cursor.fetch();
+         console.log(record.get("country_name")+" created");
+      }
+      else
+      {
+         console.log(insert.getErrorMessage());
+      }
+
+      // Update record
+      let upd:Update = table.createUpdate(new FilterGroup(filter));
+      let record:Record = new Record().set("country_name","Xanadu");
+
+      upd.setReturnColumns(retcols);
+
+      if (await upd.execute(record))
+      {
+         cursor = upd.getReturnValues();
+
+         await cursor.next();
+         let record:Record = cursor.fetch();
+         console.log(record.get("country_id")+" updated, country_name: "+record.get("country_name"));
+      }
+      else
+      {
+         console.log(upd.getErrorMessage());
+         return;
+      }
+
+      // Delete the record
+      let del:Delete = table.createDelete(new FilterGroup(filter));
+
+      await del.execute();
+      console.log(del.affected()+" row(s) deleted");
+   }
+
+
+   public async locations1(session:Session) : Promise<void>
+   {
       let rows:number = 0;
+
+      let table:Table = new Table(session,"locations");
+      let columns:string[] = ["street_address","city"];
+      let filter:Filter = Filters.Custom("country_name", new NameValuePair("country","Den%"));
+      let cursor:Cursor = await table.createQuery(columns,new FilterGroup([filter])).execute();
+
       while(await cursor.next())
       {
          rows++;
-         console.log(cursor.getRecord());
+         console.log(cursor.fetch()+"");
       }
 
       cursor.close();
       console.log("rows: "+rows);
 
-      success = await session.disconnect();
-      console.log("disconnect: "+success);
+   }
+
+
+   public async locations2(session:Session) : Promise<void>
+   {
+      let rows:number = 0;
+
+      let countries:Table = new Table(session,"countries");
+      let countryflt:Filter = Filters.Like("country_name","Den%");
+      let subquery:Query = new Query(countries,"country_id",new FilterGroup(countryflt));
+
+      let table:Table = new Table(session,"locations");
+      let columns:string[] = ["street_address","city"];
+      let filter:Filter = Filters.In("country_id",subquery);
+
+      let query:Query = table.createQuery(columns,new FilterGroup([filter]));
+      let cursor:Cursor = await query.execute();
+
+      while(await cursor.next())
+      {
+         rows++;
+         console.log(cursor.fetch()+"");
+      }
+
+      cursor.close();
+      console.log("rows: "+rows);
+
+      rows = 0;
+      subquery.bind("Swe%")
+      console.log("Now for sweden")
+      cursor = await query.execute();
+
+      while(await cursor.next())
+      {
+         rows++;
+         console.log(cursor.fetch()+"");
+      }
+
+         cursor.close();
+         console.log("rows: "+rows);
+
+   }
+
+
+   public async employees1(session:Session) : Promise<void>
+   {
+      let rows:number = 1;
+      let pagesize:number = 17;
+
+      let table:Table = new Table(session,"employees");
+      let columns:string[] = ["first_name","last_name","hire_date"];
+      let cursor:Cursor = await table.createQuery(columns).execute();
+
+      rows += await cursor.prefetch(pagesize-1);
+
+      while(true)
+      {
+         console.log("fetched "+rows);
+         rows = await cursor.prefetch(pagesize);
+         if (rows == 0) break;
+      }
+
+      console.log("rows: "+cursor.fetched())
+      cursor.close();
+   }
+
+
+   public async employees2(session:Session) : Promise<void>
+   {
+      let rows:number = 0;
+
+      let table:Table = new Table(session,"employees");
+      let date:Date = new Date("Sun Oct 19 2014 00:00:00 GMT+0200");
+
+      let filter1:Filter = Filters.IsNotNull("last_name");
+      let filter2:Filter = Filters.Like("first_name","Mia");
+      let filter3:Filter = Filters.Dates.AtThisDay("hire_date",date);
+
+      let columns:string[] = ["first_name","last_name","hire_date"];
+      let cursor:Cursor = await table.createQuery(columns,new FilterGroup([filter1,filter2,filter3])).execute();
+
+      while(await cursor.next())
+      {
+         rows++;
+         console.log(cursor.fetch()+"");
+      }
+
+      cursor.close();
+      console.log("rows: "+rows);
+   }
+
+
+   public async employees3(session:Session) : Promise<void>
+   {
+      let rows:number = 0;
+
+      let table:Table = new Table(session,"employees");
+
+      let filter1:Filter = Filters.Equals("first_name","Mia");
+      let filter2:Filter = Filters.Equals("last_name","Andersen");
+
+      let columns:string[] = ["first_name","last_name","hire_date"];
+      let query:Query = new Query(table,columns,new FilterGroup([filter1,filter2]));
+
+      query.setAssertions(new NameValuePair("first_name","Mia2"));
+
+      let cursor:Cursor = await query.execute();
+
+      console.log(query.getAssertionStatus())
+
+      while(await cursor.next())
+      {
+         rows++;
+         console.log(cursor.fetch()+"");
+      }
+
+      cursor.close();
+      console.log("rows: "+rows);
+   }
+
+
+   public async custom1(session:Session) : Promise<void>
+   {
+      let rows:number = 0;
+      let sql:AnySQL = new AnySQL(session,"custom-1",new NameValuePair("fname","Mia"));
+
+      let cursor:Cursor = await sql.select();
+
+      while(await cursor.next())
+      {
+         rows++;
+         console.log(cursor.fetch()+"");
+      }
+
+      cursor.close();
+      console.log("rows: "+rows);
+   }
+
+
+   public async getSalaryLimit(session:Session) : Promise<void>
+   {
+      let job:string = "CONS";
+      let proc:Procedure = new Procedure(session,"getSalaryLimit");
+
+      let success:boolean = await proc.execute(new NameValuePair("JoB",job));
+
+      if (!success)
+      {
+         console.log(proc.getErrorMessage());
+         return;
+      }
+
+      console.log(proc.getValue("MiN")+" "+proc.getValue("max"))
    }
 }

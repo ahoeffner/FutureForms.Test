@@ -22,8 +22,7 @@
 import { Test } from './Test';
 import { FormsModule } from 'futureforms';
 
-let fm:FormsModule = new FormsModule();
-console.log("FutureForms lib version "+fm.version());
+console.log("FutureForms lib version "+FormsModule.version());
 
 let test:Test = new Test();
-test.connect();
+test.run();

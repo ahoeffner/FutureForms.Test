@@ -1,4 +1,4 @@
-import { AnySQL, Cursor, Delete, Filter, FilterGroup, Filters, Insert, NameValuePair, Procedure, Query, Record, RecordDefinition, Session, Table, Update } from 'futureforms';
+import { AnySQL, Cursor, Delete, Filter, FilterGroup, Filters, Insert, NameValuePair, Procedure, Function, Query, Record, RecordDefinition, Session, Table, Update } from 'futureforms';
 
 export class Test
 {
@@ -17,7 +17,7 @@ export class Test
          //await this.employees3(session);
          //await this.custom1(session);
 
-         await this.getSalaryLimit(session);
+         await this.getHireDate(session);
 
          success = await session.disconnect();
       }
@@ -254,5 +254,22 @@ export class Test
       }
 
       console.log(job+" -> min: "+proc.getValue("MiN")+", max: "+proc.getValue("max"))
+   }
+
+
+   public async getHireDate(session:Session) : Promise<void>
+   {
+      let empid:number = 5;
+      let func:Function = new Function(session,"getHireDate");
+
+      let success:boolean = await func.execute(new NameValuePair("id",empid));
+
+      if (!success)
+      {
+         console.log(func.getErrorMessage());
+         return;
+      }
+
+      console.log(empid+" -> "+func.getValue("hiredate")+" "+func.getReturnValue())
    }
 }

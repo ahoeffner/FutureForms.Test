@@ -5,7 +5,7 @@ module.exports =
   output:
   {
     path: __dirname+'/dist',
-    filename: 'app.js',
+    filename: ''app.js,
     library: "futureforms"
   },
   module:

@@ -9,15 +9,14 @@ export class Test
 
       if (success)
       {
-         //await this.countries1(session);
+         await this.countries1(session);
          //await this.locations1(session);
          //await this.locations2(session);
          //await this.employees1(session);
          //await this.employees2(session);
          //await this.employees3(session);
          //await this.custom1(session);
-
-         await this.getHireDate(session);
+         //await this.getHireDate(session);
 
          success = await session.disconnect();
       }
@@ -100,7 +99,6 @@ export class Test
 
       cursor.close();
       console.log("rows: "+rows);
-
    }
 
 
@@ -139,9 +137,8 @@ export class Test
          console.log(cursor.fetch()+"");
       }
 
-         cursor.close();
-         console.log("rows: "+rows);
-
+      cursor.close();
+      console.log("rows: "+rows);
    }
 
 

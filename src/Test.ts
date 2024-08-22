@@ -48,6 +48,7 @@ export class Test
             console.log(recs[i].get("first_name"));
       }
 
+      employees.close();
    }
 
 

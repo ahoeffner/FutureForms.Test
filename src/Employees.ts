@@ -9,7 +9,7 @@ export class Employees
    constructor(session:Session)
    {
       let table:Table = new Table(session,"employees");
-      this.query = table.createQuery("*").setArrayFetch(10);
+      this.query = table.createQuery("*").setArrayFetch(17);
    }
 
 

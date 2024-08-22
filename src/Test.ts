@@ -1,4 +1,5 @@
 import { AnySQL, Cursor, Delete, Filter, FilterGroup, Filters, Insert, NameValuePair, Procedure, Function, Query, Record, RecordDefinition, Session, Table, Update } from 'futureforms';
+import { Employees } from './Employees';
 
 export class Test
 {
@@ -9,7 +10,8 @@ export class Test
 
       if (success)
       {
-         await this.countries1(session);
+         await this.employees(session);
+         //await this.countries1(session);
          //await this.locations1(session);
          //await this.locations2(session);
          //await this.employees1(session);
@@ -24,6 +26,28 @@ export class Test
       {
          console.log("Failed to connect");
       }
+   }
+
+
+   public async employees(session:Session) : Promise<void>
+   {
+      let employees:Employees = new Employees(session);
+
+      await employees.execute();
+
+      while(true)
+      {
+         let recs:Record[] = await employees.fetch();
+
+         if (recs.length == 0)
+            break;
+
+         console.log("fetched "+recs.length)
+
+         for (let i = 0; i < recs.length; i++)
+            console.log(recs[i].get("first_name"));
+      }
+
    }
 
 
@@ -94,7 +118,9 @@ export class Test
       while(await cursor.next())
       {
          rows++;
-         console.log(cursor.fetch()+"");
+         //console.log(cursor.fetch()+"");
+         let record:Record = cursor.fetch();
+         console.log(record.get("country_name"));
       }
 
       cursor.close();

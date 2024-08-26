@@ -1,5 +1,5 @@
 import { AnySQL, Cursor, Delete, Filter, FilterGroup, Filters, Insert, NameValuePair, Procedure, Function, Query, Record, RecordDefinition, Session, Table, Update } from 'futureforms';
-import { Employees } from './Employees';
+import { EmployeeQuery } from './EmployeeQuery';
 
 export class Test
 {
@@ -31,7 +31,7 @@ export class Test
 
    public async employees(session:Session) : Promise<void>
    {
-      let employees:Employees = new Employees(session);
+      let employees:EmployeeQuery = new EmployeeQuery(session,17);
 
       await employees.execute();
 
@@ -42,7 +42,8 @@ export class Test
          if (recs.length == 0)
             break;
 
-         console.log("fetched "+recs.length)
+         let more:boolean = await employees.more();
+         console.log("fetched "+recs.length+" "+more);
 
          for (let i = 0; i < recs.length; i++)
             console.log(recs[i].get("first_name"));

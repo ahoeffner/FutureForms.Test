@@ -6,6 +6,7 @@ import { Cursor, Query, Session, Table, Record, Filter, FilterGroup } from "futu
  */
 export class EmployeeQuery
 {
+   private rows:number = 0;
    private query:Query = null;
    private cursor:Cursor = null;
    private pagesize:number = null;
@@ -32,9 +33,15 @@ export class EmployeeQuery
     */
    public async execute(...values:any) : Promise<boolean>
    {
+      this.rows = 0;
       this.cursor = await this.query.execute(values);
-      if (this.query.failed()) return(false);
-      return(true);
+      return(!this.query.failed());
+   }
+
+
+   public fetched() : number
+   {
+      return(this.rows);
    }
 
 
@@ -59,6 +66,7 @@ export class EmployeeQuery
       while((this.pagesize <= 0 || recs.length < this.pagesize) && await this.cursor.next())
          recs.push(this.cursor.fetch());
 
+      this.rows += recs.length;
       return(recs);
    }
 

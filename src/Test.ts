@@ -31,7 +31,7 @@ export class Test
 
    public async employees(session:Session) : Promise<void>
    {
-      let employees:EmployeeQuery = new EmployeeQuery(session,17);
+      let employees:EmployeeQuery = new EmployeeQuery(session,10);
 
       await employees.execute();
 
@@ -50,6 +50,7 @@ export class Test
       }
 
       employees.close();
+      console.log("rows: "+employees.fetched());
    }
 
 
@@ -142,7 +143,7 @@ export class Test
       let columns:string[] = ["street_address","city"];
       let filter:Filter = Filters.In("country_id",subquery);
 
-      let query:Query = table.createQuery(columns,new FilterGroup([filter]));
+      let query:Query = table.createQuery(columns,filter);
       let cursor:Cursor = await query.execute();
 
       while(await cursor.next())
@@ -155,9 +156,8 @@ export class Test
       console.log("rows: "+rows);
 
       rows = 0;
-      subquery.bind("Swe%")
-      console.log("Now for sweden")
-      cursor = await query.execute();
+      console.log("Now for sweden");
+      cursor = await query.execute("Swe%");
 
       while(await cursor.next())
       {

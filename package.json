@@ -12,7 +12,7 @@
   "author": "Alex Høffner",
   "license": "ISC",
   "dependencies": {
-    "futureforms": "file:../lib/dist"
+    "futureforms": "file:../core/dist"
   },
   "devDependencies": {
     "html-loader": "*",

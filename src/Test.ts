@@ -1,5 +1,7 @@
-import { AnySQL, Cursor, Delete, Filter, FilterGroup, Filters, Insert, NameValuePair, Procedure, Function, Query, Record, RecordDefinition, Session, Table, Update } from 'futureforms';
+import { Custom } from './Custom';
 import { EmployeeQuery } from './EmployeeQuery';
+import { AnySQL, Cursor, Delete, Filter, FilterGroup, Filters, Insert, NameValuePair, Procedure, Function, Query, Record, RecordDefinition, Session, Table, Update } from 'futureforms';
+
 
 export class Test
 {
@@ -10,7 +12,8 @@ export class Test
 
       if (success)
       {
-         await this.employees(session);
+         await this.masterdetail(session);
+         //await this.employees(session);
          //await this.countries1(session);
          //await this.locations1(session);
          //await this.locations2(session);
@@ -26,6 +29,23 @@ export class Test
       {
          console.log("Failed to connect");
       }
+   }
+
+
+   public async masterdetail(session:Session) : Promise<void>
+   {
+      let master:Table = new Table(session,"countries");
+      let detail:Table = new Table(session,"locations");
+
+      let join:Filter = Filters.Equals("country_id",null);
+
+      let countries:Query = new Query(master);
+      let locations:Query = new Query(detail,"street_name",join);
+
+      let custom:Custom = new Custom(session);
+      let response:any = await custom.getLocations(countries,locations);
+
+      console.log(response);
    }
 
 

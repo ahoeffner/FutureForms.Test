@@ -8,12 +8,12 @@ export class Test
    public async run()
    {
       let session:Session = new Session();
-      let success:boolean = await session.connect("hr","hr");
+      let success:boolean = await session.connect(null);
 
       if (success)
       {
-         await this.masterdetail(session);
-         //await this.employees(session);
+         //await this.masterdetail(session);
+         await this.employees(session);
          //await this.countries1(session);
          //await this.locations1(session);
          //await this.locations2(session);
@@ -37,10 +37,10 @@ export class Test
       let master:Table = new Table(session,"countries");
       let detail:Table = new Table(session,"locations");
 
-      let join:Filter = Filters.Equals("country_id",null);
+      let join:Filter = Filters.Equals("country_id","Jonas");
 
       let countries:Query = new Query(master);
-      let locations:Query = new Query(detail,"street_name",join);
+      let locations:Query = new Query(detail,"street_address",join);
 
       let custom:Custom = new Custom(session);
       let response:any = await custom.getLocations(countries,locations);

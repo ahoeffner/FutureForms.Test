@@ -10,8 +10,8 @@ export class Custom extends CustomRequest
          Custom:
          {
             type: "Locations",
-            countries: countries,
-            locations: locations
+            countries: countries.getBasicRequest(true),
+            locations: locations.getBasicRequest(true)
          }
       }
 

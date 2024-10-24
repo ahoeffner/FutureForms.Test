@@ -7,13 +7,15 @@ export class Test
 {
    public async run()
    {
+		console.log("Logging on")
       let session:Session = new Session();
-      let success:boolean = await session.connect(null);
+      let success:boolean = await session.connect("hr","hr");
 
       if (success)
       {
+         await this.parameterized(session);
          //await this.masterdetail(session);
-         await this.employees(session);
+         //await this.employees(session);
          //await this.countries1(session);
          //await this.locations1(session);
          //await this.locations2(session);
@@ -72,6 +74,31 @@ export class Test
       employees.close();
       console.log("rows: "+employees.fetched());
    }
+
+
+	public async parameterized(session:Session) : Promise<void>
+	{
+		session.addVPDContext("country","DK");
+		let success:boolean = await session.setProperties();
+
+		console.log("VPD Context is set to DK "+success);
+
+      let rows:number = 0;
+		let bindvalues:NameValuePair[] = [new NameValuePair("city","Ballerup")]
+      let table:Table = new Table(session,"LocationWithCountry",bindvalues);
+
+      let columns:string[] = ["country_name","street_address","city"];
+      let cursor:Cursor = await table.createQuery(columns).execute();
+
+      while(await cursor.next())
+      {
+         rows++;
+         console.log(cursor.fetch()+"");
+      }
+
+      cursor.close();
+      console.log("rows: "+rows);
+	}
 
 
    public async countries1(session:Session) : Promise<void>

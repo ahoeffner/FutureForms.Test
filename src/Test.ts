@@ -8,7 +8,6 @@ export class Test
 {
    public async run()
    {
-		console.log("Logging on")
       let session:Session = Application.session;
 
       if (session)
@@ -25,6 +24,8 @@ export class Test
          //await this.custom1(session);
          //await this.getHireDate(session);
       }
+
+		await Application.stop();
    }
 
 

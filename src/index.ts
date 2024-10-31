@@ -48,15 +48,19 @@ export class Application
       let success:boolean = await Application.session$.connect("hr","hr");
 
 		if (!success)
-		{
-			console.log("Failed to connect");
-			return;
-		}
+			throw "Failed to connect";
 
 		let test:Test = new Test();
 		await test.run();
+	}
 
-		Application.session.disconnect();
+
+	public static async stop() : Promise<void>
+	{
+		let success:boolean = await Application.session.disconnect();
+
+		if (!success)
+			throw "Failed to disconnect";
 	}
 }
 

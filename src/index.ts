@@ -22,7 +22,6 @@
 import { Test } from './Test';
 import { FormsModule, Session } from 'futureforms';
 
-
 export class Application
 {
 	/**
@@ -42,10 +41,10 @@ export class Application
 	/**
 	 * Start the application
 	 */
-	public static async start() : Promise<void>
+	public static async start(dbusername:String, dbpassword:String) : Promise<void>
 	{
 		Application.session$ = new Session();
-      let success:boolean = await Application.session$.connect("hr","hr");
+      let success:boolean = await Application.session$.connect(dbusername,dbpassword);
 
 		if (!success)
 			throw "Failed to connect";
@@ -66,4 +65,4 @@ export class Application
 
 
 console.log("FutureForms lib version "+FormsModule.version());
-Application.start();
+Application.start("hr","hr");

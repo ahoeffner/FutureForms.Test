@@ -20,9 +20,46 @@
 */
 
 import { Test } from './Test';
-import { FormsModule } from 'futureforms';
+import { FormsModule, Session } from 'futureforms';
+
+
+export class Application
+{
+	/**
+	 * Session to JsonWebDB
+	 */
+	private static session$:Session = null;
+
+	/**
+	 * Readonly access to session
+	 */
+	public static get session() : Session
+	{
+		return(this.session$);
+	}
+
+	// Start appl
+	/**
+	 * Start the application
+	 */
+	public static async start() : Promise<void>
+	{
+		Application.session$ = new Session();
+      let success:boolean = await Application.session$.connect("hr","hr");
+
+		if (!success)
+		{
+			console.log("Failed to connect");
+			return;
+		}
+
+		let test:Test = new Test();
+		await test.run();
+
+		Application.session.disconnect();
+	}
+}
+
 
 console.log("FutureForms lib version "+FormsModule.version());
-
-let test:Test = new Test();
-test.run();
+Application.start();

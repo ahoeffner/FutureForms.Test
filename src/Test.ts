@@ -1,3 +1,4 @@
+import { Application } from '.';
 import { Custom } from './Custom';
 import { EmployeeQuery } from './EmployeeQuery';
 import { AnySQL, Cursor, Delete, Filter, FilterGroup, Filters, Insert, NameValuePair, Procedure, Function, Query, Record, RecordDefinition, Session, Table, Update } from 'futureforms';
@@ -8,10 +9,9 @@ export class Test
    public async run()
    {
 		console.log("Logging on")
-      let session:Session = new Session();
-      let success:boolean = await session.connect("hr","hr");
+      let session:Session = Application.session;
 
-      if (success)
+      if (session)
       {
          await this.parameterized(session);
          //await this.masterdetail(session);
@@ -24,12 +24,6 @@ export class Test
          //await this.employees3(session);
          //await this.custom1(session);
          //await this.getHireDate(session);
-
-         success = await session.disconnect();
-      }
-      else
-      {
-         console.log("Failed to connect");
       }
    }
 

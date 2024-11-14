@@ -45,7 +45,7 @@ export class Application
 	public static async start() : Promise<void>
 	{
 		Application.session$ = new Session();
-      let success:boolean = await Application.session$.connect("hr","hr");
+      let success:boolean = await Application.session$.connect();
 
 		if (!success)
 			throw "Failed to connect";

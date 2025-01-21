@@ -8,15 +8,19 @@ export class Test
 {
    public async run()
    {
+		console.log("Starting test");
       let session:Session = Application.session;
+
+		session.addVPDContext("email","alex@hoeffner.net");
+		await session.setProperties();
 
       if (session)
       {
-         await this.parameterized(session);
+         //await this.parameterized(session);
          //await this.masterdetail(session);
          //await this.employees(session);
          //await this.countries1(session);
-         //await this.locations1(session);
+         await this.locations1(session);
          //await this.locations2(session);
          //await this.employees1(session);
          //await this.employees2(session);
@@ -155,17 +159,21 @@ export class Test
    {
       let rows:number = 0;
 
+		let grp:FilterGroup = new FilterGroup();
+
+		grp.add(Filters.Like("city","Ball%"));
+		grp.or(Filters.Like("city","SomeSwedishCity%"));
+		grp.add(Filters.Custom("country_name", new NameValuePair("country","Den%")));
+
       let table:Table = new Table(session,"locations");
-      let columns:string[] = ["street_address","city"];
-      let filter:Filter = Filters.Custom("country_name", new NameValuePair("country","Den%"));
-      let cursor:Cursor = await table.createQuery(columns,new FilterGroup([filter])).execute();
+      let columns:string[] = ["country_id","street_address","city"];
+      let cursor:Cursor = await table.createQuery(columns,grp).execute();
 
       while(await cursor.next())
       {
          rows++;
-         //console.log(cursor.fetch()+"");
          let record:Record = cursor.fetch();
-         console.log(record.get("country_name"));
+         console.log(record.get("country_id"));
       }
 
       cursor.close();
